@@ -1,0 +1,14 @@
+{
+  "name": "track-blockchain-fee",
+  "version": "1.0.0",
+  "description": "Track estimated blockchain's fee",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx tsc && node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
