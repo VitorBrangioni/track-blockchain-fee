@@ -1,18 +1,21 @@
 
-import * as bitcoin from "./services/bitcoin";
-import * as bsc from "./services/binance-smart-chain";
+import * as bitcoin from "./services/crypto/bitcoin";
+import * as bsc from "./services/crypto/binance-smart-chain";
+import { reportFee  } from "./services/report-fee";
+
 
 (() => {
     setInterval(() => {
-        const date = new Date();
-        
-        const baseMessage = `Fee for Bitcoin at ${date}: `;
-        bitcoin.calculateFee()
-            .then(fee => console.log(baseMessage.concat(`${fee.toFixed()} BTC`)));
-
-        bsc.calculateFee()
-            .then(fee => console.log(baseMessage.concat(`${fee} BNB`)));
-
+        const promises = Promise.allSettled([
+            bitcoin.calculateFee(),
+            bsc.calculateFee()
+        ]);
+``
+        promises.then((results) => {
+            results.forEach(res => {
+                if(res.status === 'fulfilled')
+                    reportFee(res.value);
+            });
+        })
     }, 10000);
-
 })();

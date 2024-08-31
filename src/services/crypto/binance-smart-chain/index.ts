@@ -1,25 +1,22 @@
 import axios from "axios";
+import BigNumber from "bignumber.js";
+import { CalculateFeeResult } from "../interfaces";
+import { convertWeiToBNB } from "../utils";
+
+const currency = 'BNB';
 
 export async function fetchGasPrice() {
     return axios.post('https://bsc.publicnode.com/', { "method": "eth_maxPriorityFeePerGas", "params": [], "id": 1, "jsonrpc": "2.0" })
         .then(({ data }) => Number(data?.result))
-        .catch(err => {
-            throw err;
-        });
 }
 
-export async function calculateFee(gasLimit = 55000) {
+export async function calculateFee(gasLimit = 55000): Promise<CalculateFeeResult> {
     const gasPrice = await fetchGasPrice();
     const estimatedFee = gasLimit * convertWeiToBNB(gasPrice);
 
-    return estimatedFee;
+    return {
+        currency,
+        value: BigNumber(estimatedFee)
+    }
 }
 
-export function parseHexToNumber(hex: string) {
-    return Number(hex);
-}
-
-export function convertWeiToBNB(wei: number) {
-    const weiToBnb = 10e-18;
-    return wei * weiToBnb;
-}

@@ -12,7 +12,9 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@types/node": "^22.5.1",
     "axios": "^1.7.5",
-    "bignumber.js": "^9.1.2"
+    "bignumber.js": "^9.1.2",
+    "winston": "^3.14.2"
   }
 }
