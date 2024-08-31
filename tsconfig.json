@@ -5,9 +5,8 @@
       "removeComments": true,
       "allowSyntheticDefaultImports": true,
       "target": "es2020",
-      "sourceMap": true,
       "outDir": "./dist",
-      "baseUrl": "src",
+      "baseUrl": "./src",
       "incremental": true,
       "resolveJsonModule": true,
       "esModuleInterop": true
