@@ -4,6 +4,7 @@ import { CalculateFeeResult } from "../interfaces";
 import { logger } from "../../report-fee";
 
 const currency = 'BTC';
+type NextBlocksInMinutes = '30' | '60' | '120' | '180' | '360' | '720' | '1440'
 
 export async function calculateFee(transactionSize: number = 140): Promise<CalculateFeeResult> {
     try {
@@ -26,16 +27,15 @@ export async function calculateSatPerVbyte(transactionSize: number = 140) {
 }
 
 export function parseSatoshiToBTC(satoshi: number) {
-    return BigNumber(satoshi * (10e-9));
+    return BigNumber(satoshi * (1e-8));
 }
 
-export async function fetchFeeRateInSatoshi(): Promise<number> {
+export async function fetchFeeRateInSatoshi(nextBlocksInMinutes: NextBlocksInMinutes = '30'): Promise<number> {
     try {
-        const next3blocks = '30';
         const data = await axios.get('https://bitcoiner.live/api/fees/estimates/latest')
             .then(({ data }) => data);
 
-        const p2wpkhInSatoshi = data?.estimates[next3blocks]?.total?.p2wpkh?.satoshi;
+        const p2wpkhInSatoshi = data?.estimates[nextBlocksInMinutes]?.total?.p2wpkh?.satoshi;
 
         if (!p2wpkhInSatoshi)
             throw Error('Error to get p2wpkh value');
