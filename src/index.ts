@@ -1,13 +1,13 @@
 
-import * as bitcoin from "./services/crypto/bitcoin";
 import * as bsc from "./services/crypto/binance-smart-chain";
+import * as btc from "./services/crypto/bitcoin";
 import * as eth from "./services/crypto/ethereum";
-import { reportFee, logger  } from "./services/report-fee";
+import { reportFee } from "./services/report-fee";
 
 (() => {
     setInterval(() => {
         const promises = Promise.allSettled([
-            bitcoin.calculateFee(),
+            btc.calculateFee(),
             bsc.calculateFee(),
             eth.calculateFee()
         ]);
