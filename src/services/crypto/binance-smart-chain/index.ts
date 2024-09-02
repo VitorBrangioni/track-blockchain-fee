@@ -1,7 +1,7 @@
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import { CalculateFeeResult } from "../interfaces";
-import { convertWeiToBNB } from "../utils";
+import { convertWeiToBnbOrEther } from "../utils";
 
 const currency = 'BNB';
 
@@ -26,7 +26,7 @@ export async function fetchGasPrice() {
 
 export async function calculateFee(gasLimit = 55000): Promise<CalculateFeeResult> {
     const gasPrice = await fetchGasPrice();
-    const estimatedFee = gasLimit * convertWeiToBNB(gasPrice);
+    const estimatedFee = gasLimit * convertWeiToBnbOrEther(gasPrice);
 
     return {
         currency,
