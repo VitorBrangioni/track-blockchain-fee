@@ -6,8 +6,22 @@ services:
     build:
       context: .
     restart: unless-stopped
+    depends_on:
+      - redis
     networks:
       - trackblockchainfee-network
-
+  redis:
+    image: redis:7.4-alpine
+    container_name: blochain-fee-redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes: 
+      - redis:/data
+    networks:
+      - trackblockchainfee-network
 networks:
   trackblockchainfee-network:
+volumes:
+  redis:
+    driver: local
