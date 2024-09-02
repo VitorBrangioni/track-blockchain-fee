@@ -6,8 +6,22 @@ import { convertWeiToBNB } from "../utils";
 const currency = 'BNB';
 
 export async function fetchGasPrice() {
-    return axios.post('https://bsc.publicnode.com/', { "method": "eth_maxPriorityFeePerGas", "params": [], "id": 1, "jsonrpc": "2.0" })
-        .then(({ data }) => Number(data?.result))
+    try {
+        const data = await axios.post('https://bsc.publicnode.com/', { "method": "eth_maxPriorityFeePerGas", "params": [], "id": 1, "jsonrpc": "2.0" })
+            .then(({ data }) => data);
+
+        const gasPriceInHex = data?.result;
+        const gasPriceinNumber = Number(gasPriceInHex);
+
+        if (!gasPriceinNumber) {
+            throw Error('Error to fetch the gas price');
+        }
+
+        return gasPriceinNumber;
+        
+    } catch (error) {
+        throw error;
+    }
 }
 
 export async function calculateFee(gasLimit = 55000): Promise<CalculateFeeResult> {
