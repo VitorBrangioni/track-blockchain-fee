@@ -48,9 +48,9 @@ describe('binance-smart-chain', () => {
             const expectedMessageError = 'Network Error';
             mockedAxios.post.mockRejectedValueOnce(new Error(expectedMessageError));
 
-            const gasPrice = fetchGasPrice();
+            const fetchGasPricePromise = fetchGasPrice();
 
-            await expect(gasPrice)
+            await expect(fetchGasPricePromise)
                 .rejects
                 .toThrow(expectedMessageError);
         });
