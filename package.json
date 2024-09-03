@@ -4,7 +4,7 @@
   "description": "Track estimated blockchain's fee",
   "main": "index.js",
   "scripts": {
-    "start": "npx tsc && node dist/index.js",
+    "start": "npx tsc && node dist/src/index.js",
     "test": "jest"
   },
   "author": "",
@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.5.4"
   },
   "dependencies": {

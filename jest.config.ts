@@ -5,6 +5,7 @@ const config: Config = {
     transform: {},
     testRegex: ".*\\.test\\.ts$",
     testEnvironment: "node",
+    preset: 'ts-jest'
 };
 
 export default config;
