@@ -5,13 +5,13 @@ import { convertWeiToBnbOrEther } from "../utils";
 
 const currency = 'BNB';
 
-export async function fetchGasPrice() {
+export async function fetchGasPrice(): Promise<BigNumber> {
     try {
         const data = await axios.post('https://bsc.publicnode.com/', { "method": "eth_maxPriorityFeePerGas", "params": [], "id": 1, "jsonrpc": "2.0" })
             .then(({ data }) => data);
 
         const gasPriceInHex = data?.result;
-        const gasPriceinNumber = Number(gasPriceInHex);
+        const gasPriceinNumber = BigNumber(gasPriceInHex);
 
         if (!gasPriceinNumber) {
             throw Error('Error to fetch the gas price');
@@ -26,11 +26,11 @@ export async function fetchGasPrice() {
 
 export async function calculateFee(gasLimit = 55000): Promise<CalculateFeeResult> {
     const gasPrice = await fetchGasPrice();
-    const estimatedFee = gasLimit * convertWeiToBnbOrEther(gasPrice);
+    const estimatedFee = convertWeiToBnbOrEther(gasPrice).multipliedBy(gasLimit);
 
     return {
         currency,
-        value: BigNumber(estimatedFee)
+        value: estimatedFee
     }
 }
 

@@ -69,9 +69,9 @@ describe('binance-smart-chain', () => {
             mockedAxios.post.mockResolvedValue({ data: expectedData });
 
             const gasLimit = 55000;
-            const gasPriceInBnb = convertWeiToBnbOrEther(Number(resultInHex));
+            const gasPriceInBnb = convertWeiToBnbOrEther(BigNumber(resultInHex));
 
-            const expectedEstimatedFee = gasLimit * gasPriceInBnb;
+            const expectedEstimatedFee = gasPriceInBnb.multipliedBy(gasLimit);
 
             const result = await calculateFee();
             const expectedResult: CalculateFeeResult = {

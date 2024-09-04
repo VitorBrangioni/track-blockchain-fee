@@ -1,6 +1,7 @@
+import BigNumber from "bignumber.js";
 
-export function convertWeiToBnbOrEther(wei: number) {
-    const weiInBnbOrEther = 1e-18;
-    
-    return wei * weiInBnbOrEther;
+export const weiInBnbOrEther = new BigNumber(1e-18);
+
+export function convertWeiToBnbOrEther(wei: BigNumber): BigNumber {
+    return wei.multipliedBy(weiInBnbOrEther)
 }
