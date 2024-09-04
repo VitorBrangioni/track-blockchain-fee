@@ -13,7 +13,7 @@ export async function fetchGasPrice() : Promise<BigNumber> {
         const gasPriceInHex = data?.result;
         const gasPriceinNumber = BigNumber(gasPriceInHex);
 
-        if (!gasPriceinNumber) {
+        if (gasPriceinNumber.isNaN()) {
             throw Error('Error to fetch the gas price');
         }
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { calculateFee, calculateSatPerVbyte, fetchFeeRateInSatoshi, parseSatoshiToBTC } from ".";
+import { calculateFee, fetchFeeRateInSatoshi, parseSatoshiToBTC } from ".";
 import BigNumber from "bignumber.js";
 import { CalculateFeeResult } from "../interfaces";
 import { logger } from "../../report-fee";
@@ -38,22 +38,23 @@ describe('bitcoin', () => {
             mockedAxios.get.mockResolvedValue({ data: expectedData });
 
             const feeRateInSatoshi = await fetchFeeRateInSatoshi();
+            const expectedFeeRateInSatoshi = BigNumber(expectedData.estimates['30'].sat_per_vbyte);
 
             expect(mockedAxios.get).toHaveBeenCalledWith('https://bitcoiner.live/api/fees/estimates/latest');
-            expect(feeRateInSatoshi).toBe(expectedData.estimates['30'].total.p2wpkh.satoshi);
+            expect(feeRateInSatoshi).toEqual(expectedFeeRateInSatoshi);
         });
 
         it('should throw an error if it doesnt return a number', async () => {
-            const expectedErrorMessage = 'Error to get p2wpkh value';
+            const expectedErrorMessage = 'Error to get satoshi per vbyte';
             const mockData = {
                 "timestamp": 1725362927,
                 "estimates": {
                     "30": {
-                        "sat_per_vbyte": 6,
+                        "sat_per_vbyte": 'IsNotNumber',
                         "total": {
                             "p2wpkh": {
                                 "usd": 0.5066172018,
-                                "satoshi": 'isNotNumber'
+                                "satoshi": 877
                             },
                             "p2sh-p2wpkh": {
                                 "usd": 0.5964429468,
@@ -91,18 +92,18 @@ describe('bitcoin', () => {
     describe('parseSatoshiToBTC', () => {
 
         it('should parse satoshi to BTC correctly', () => {
-            const satoshi = 846;
+            const satoshi = BigNumber(846);
             const satoshiInBtc = parseSatoshiToBTC(satoshi);
 
-            const expectedSatoshiInBtc = satoshi * (1e-8);
+            const expectedSatoshiInBtc = satoshi.multipliedBy(1e-8);
 
             expect(satoshiInBtc).toEqual(BigNumber(expectedSatoshiInBtc));
         });
     });
 
-    describe('calculateSatPerVbyte', () => {
+    describe('calculateFee', () => {
 
-        it('should calculate Satoshi per Vbyte correctly', async () => {
+        it('should calculate fee correctly', async () => {
             const expectedData = {
                 "timestamp": 1725362927,
                 "estimates": {
@@ -125,57 +126,27 @@ describe('bitcoin', () => {
                     },
                 }
             }
+            const expectedSatPerVbyte = expectedData.estimates['30'].sat_per_vbyte;
             mockedAxios.get.mockResolvedValue({ data: expectedData });
 
             const transactionSizeDefault = 140;
-            const satPerVbyteExpectedWithoutParams = (expectedData.estimates['30'].total.p2wpkh.satoshi / transactionSizeDefault) * transactionSizeDefault;
-            const satPerVbyteResWithoutParam = await calculateSatPerVbyte();
-
-            const transactionSize = 333333;
-            const satPerVbyteExpectedWithParams = (expectedData.estimates['30'].total.p2wpkh.satoshi / transactionSize) * transactionSize;
-            const satPerVbyteResWithParam = await calculateSatPerVbyte(transactionSize);
-
-            expect(satPerVbyteResWithoutParam).toBe(satPerVbyteExpectedWithoutParams);
-            expect(satPerVbyteExpectedWithParams).toBe(satPerVbyteResWithParam);
-        });
-    });
-
-    describe('calculateFee', () => {
-
-        it('should calculate the estimated fee correctly', async () => {
-            const mockData = {
-                "timestamp": 1725362927,
-                "estimates": {
-                    "30": {
-                        "sat_per_vbyte": 6,
-                        "total": {
-                            "p2wpkh": {
-                                "usd": 0.5066172018,
-                                "satoshi": 846
-                            },
-                            "p2sh-p2wpkh": {
-                                "usd": 0.5964429468,
-                                "satoshi": 996
-                            },
-                            "p2pkh": {
-                                "usd": 0.8120247348,
-                                "satoshi": 1356
-                            }
-                        }
-                    },
-                }
-            }
-            mockedAxios.get.mockResolvedValue({ data: mockData });
-
-            const expectedValueInSatoshi = mockData.estimates[30].total.p2wpkh.satoshi;// TODO
-            const expectedData: CalculateFeeResult = {
+            const expectedFeeWithoutParams = BigNumber(expectedSatPerVbyte).multipliedBy(transactionSizeDefault);
+            const expectedResultWithoutParams: CalculateFeeResult = {
                 currency: 'BTC',
-                value: parseSatoshiToBTC(expectedValueInSatoshi)
+                value: parseSatoshiToBTC(expectedFeeWithoutParams)
             };
+            const realFeeResultWithoutParam = await calculateFee();
 
-            const estimatedFee = await calculateFee();
+            const transactionSizeWithParam = 33333;
+            const expectedFeeWithParam = BigNumber(expectedSatPerVbyte).multipliedBy(transactionSizeWithParam);
+            const expectedResultWithParam: CalculateFeeResult = {
+                currency: 'BTC',
+                value: parseSatoshiToBTC(expectedFeeWithParam)
+            };
+            const realFeeResultWithParam = await calculateFee(transactionSizeWithParam);
 
-            expect(estimatedFee).toEqual(expectedData);
+            expect(realFeeResultWithoutParam).toEqual(expectedResultWithoutParams);
+            expect(realFeeResultWithParam).toEqual(expectedResultWithParam);
         });
 
         it('should log an error if there`s any failure.', async () => {

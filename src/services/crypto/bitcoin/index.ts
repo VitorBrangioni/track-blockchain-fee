@@ -4,43 +4,44 @@ import { CalculateFeeResult } from "../interfaces";
 import { logger } from "../../report-fee";
 
 const currency = 'BTC';
-type NextBlocksInMinutes = '30' | '60' | '120' | '180' | '360' | '720' | '1440'
+type NextBlocksInMinutes = '30' | '60' | '120' | '180' | '360' | '720' | '1440';
 
 export async function calculateFee(transactionSize: number = 140): Promise<CalculateFeeResult> {
     try {
-        const estimatedFeeInBTC = await calculateSatPerVbyte(transactionSize); 
+        const feeRateInSatoshi = await fetchFeeRateInSatoshi();
+        const estimatedFeeInBTC = feeRateInSatoshi.multipliedBy(transactionSize);
     
         return {
             currency,
             value: parseSatoshiToBTC(estimatedFeeInBTC)
         }
     } catch (error) {
+        console.log(' #### erorr ', error);
         logger.error('Error to calculate fee: ' + error.message);
     }
 }
 
-export async function calculateSatPerVbyte(transactionSize: number = 140) {
-    const feeRateInSatoshi = await fetchFeeRateInSatoshi();
-    const satPerVbyte = feeRateInSatoshi / transactionSize; 
+// export async function calculateSatPerVbyte(transactionSize: number = 140) {
+//     const feeRateInSatoshi = await fetchFeeRateInSatoshi();
 
-    return satPerVbyte * transactionSize;
+//     return feeRateInSatoshi.multipliedBy(transactionSize);
+// }
+
+export function parseSatoshiToBTC(satoshi: BigNumber) {
+    return satoshi.multipliedBy(1e-8);
 }
 
-export function parseSatoshiToBTC(satoshi: number) {
-    return BigNumber(satoshi * (1e-8));
-}
-
-export async function fetchFeeRateInSatoshi(nextBlocksInMinutes: NextBlocksInMinutes = '30'): Promise<number> {
+export async function fetchFeeRateInSatoshi(nextBlocksInMinutes: NextBlocksInMinutes = '30'): Promise<BigNumber> {
     try {
         const data = await axios.get('https://bitcoiner.live/api/fees/estimates/latest')
             .then(({ data }) => data);
 
-        const p2wpkhInSatoshi = data?.estimates[nextBlocksInMinutes]?.total?.p2wpkh?.satoshi;
+        const satPerVbyte = BigNumber(data?.estimates[nextBlocksInMinutes]?.sat_per_vbyte);
 
-        if (!p2wpkhInSatoshi)
-            throw Error('Error to get p2wpkh value');
+        if (satPerVbyte.isNaN())
+            throw Error('Error to get satoshi per vbyte');
 
-        return p2wpkhInSatoshi;
+        return BigNumber(satPerVbyte);
 
     } catch (error) {
         throw error;

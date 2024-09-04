@@ -24,7 +24,7 @@ describe('binance-smart-chain', () => {
             const gasPrice = await fetchGasPrice();
 
             expect(mockedAxios.post).toHaveBeenCalledWith('https://bsc.publicnode.com/', { "method": "eth_maxPriorityFeePerGas", "params": [], "id": 1, "jsonrpc": "2.0" });
-            expect(gasPrice).toBe(Number(resultInHex));
+            expect(gasPrice).toEqual(BigNumber(resultInHex));
         });
 
         it('should throw an error if it doesnt return a number', async () => {
@@ -73,13 +73,13 @@ describe('binance-smart-chain', () => {
 
             const expectedEstimatedFee = gasPriceInBnb.multipliedBy(gasLimit);
 
-            const result = await calculateFee();
+            const realResult = await calculateFee(gasLimit);
             const expectedResult: CalculateFeeResult = {
                 currency: 'BNB',
                 value: BigNumber(expectedEstimatedFee)
             };
 
-            expect(result).toEqual(expectedResult);
+            expect(realResult).toEqual(expectedResult);
 
         });
     });
