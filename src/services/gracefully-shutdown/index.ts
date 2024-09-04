@@ -1,4 +1,5 @@
 import { BehaviorSubject } from "rxjs";
+import { logger } from "../logger";
 
 type SignalToTerminate = 'SIGTERM' | 'SIGINT';
 
@@ -8,7 +9,7 @@ const waitStopProcessToExit = (signalToTerminate: SignalToTerminate) => {
     isRunning.subscribe(value => {
         console.log(`Received ${signalToTerminate}, shutting down gracefully...`);
         if (value === false) {
-            console.log('Finished gracefully');
+            logger.info('Finished gracefully');
             process.exit(0);
         }
     });

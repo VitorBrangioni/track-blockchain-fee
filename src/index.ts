@@ -7,13 +7,13 @@ import { formatError, logger, reportFee } from "./services/logger";
 import handleGracefullyShutdown from "./services/gracefully-shutdown";
 
 (() => {
-    logger.info('RUNNING...');
-    console.log('## RUNNING');
-    
     handleGracefullyShutdown();
+
+    logger.info('RUNNING...');
 
     setInterval(() => {
         isRunning.next(true);
+
         const promises = Promise.allSettled([
             bsc.calculateFee(),
             btc.calculateFee(),

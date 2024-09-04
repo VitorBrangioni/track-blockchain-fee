@@ -24,12 +24,16 @@ const errorFilter = format((info) => {
 });
 
 const formatLog = printf(({ level, message, timestamp }) => {
-    return `${timestamp} [${level.toUpperCase()}]: ${message}`;
+    const msg = `${timestamp} [${level.toUpperCase()}]: ${message}`;
+    console.log(msg);
+
+    return msg;
 });
 
 export const logger = winston.createLogger({
     defaultMeta: { service: 'track-blockchain-fee' },
     transports: [
+        new winston.transports.Console(),
         new winston.transports.File({
             filename: '/logs/errors.log', level: 'error', format: combine(
                 timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -58,7 +62,6 @@ export async function reportFee(feeResult: CalculateFeeResult) {
     const date = new Date().toISOString().replace('Z', '+00:00');;
     const message = `Fee for ${cryptoName} at ${date}: ${feeResult.value.toString()} ${feeResult.currency}`;
 
-    console.log(message);
     logger.info(message);
 
     setPreviousValue(feeResult);
