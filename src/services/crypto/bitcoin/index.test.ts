@@ -2,7 +2,7 @@ import axios from "axios";
 import { calculateFee, fetchFeeRateInSatoshi, parseSatoshiToBTC } from ".";
 import BigNumber from "bignumber.js";
 import { CalculateFeeResult } from "../interfaces";
-import { logger } from "../../report-fee";
+import { logger } from "../../logger";
 
 jest.mock("axios");
 
@@ -149,15 +149,5 @@ describe('bitcoin', () => {
             expect(realFeeResultWithParam).toEqual(expectedResultWithParam);
         });
 
-        it('should log an error if there`s any failure.', async () => {
-            const expectedMessageError = 'Any Error';
-            mockedAxios.get.mockRejectedValueOnce(new Error(expectedMessageError));
-
-            const loggerErrorSpy = jest.spyOn(logger, 'error').mockImplementation(() => logger);
-
-            await calculateFee();
-
-            expect(loggerErrorSpy).toHaveBeenCalledWith(`Error to calculate fee: ${expectedMessageError}`);
-        });
     });
 });

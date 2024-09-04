@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "npx tsc && node dist/index.js",
-    "start-service": "docker-compose build && docker-compose up fee-track"
+    "start-service": "docker-compose build && docker-compose up fee-track",
+    "test": "jest",
+    "test:watch": "jest -o --watch",
+    "test:cov": "jest --coverage"
   },
   "author": "",
   "license": "ISC",
