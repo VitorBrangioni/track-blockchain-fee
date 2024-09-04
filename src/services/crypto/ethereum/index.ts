@@ -5,13 +5,13 @@ import { CalculateFeeResult } from "../interfaces";
 
 const currency = 'ETH';
 
-export async function fetchGasPrice() : Promise<number> {
+export async function fetchGasPrice() : Promise<BigNumber> {
     try {
         const data = await axios.post('https://ethereum.publicnode.com/', { "method": "eth_gasPrice", "params": [], "id": 1, "jsonrpc": "2.0" })
             .then(({ data }) => data);
 
         const gasPriceInHex = data?.result;
-        const gasPriceinNumber = Number(gasPriceInHex);
+        const gasPriceinNumber = BigNumber(gasPriceInHex);
 
         if (!gasPriceinNumber) {
             throw Error('Error to fetch the gas price');
@@ -25,13 +25,15 @@ export async function fetchGasPrice() : Promise<number> {
 
 }
 
-export async function calculateFee(gasLimit = 55000, tip = 0): Promise<CalculateFeeResult> {
+export async function calculateFee(gasLimit = 21000, tipInWei = BigNumber(0)): Promise<CalculateFeeResult> {
     const gasPrice = await fetchGasPrice();
-    const estimatedFee = gasLimit * (convertWeiToBnbOrEther(gasPrice) + tip);
 
+    const estimatedFeeWei = gasPrice.plus(tipInWei).multipliedBy(gasLimit);
+    const estimatedFeeEther = convertWeiToBnbOrEther(estimatedFeeWei);
+    
     return {
         currency,
-        value: BigNumber(estimatedFee)
+        value: estimatedFeeEther
     }
     
 }
