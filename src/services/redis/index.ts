@@ -1,6 +1,6 @@
 import IORedis from 'ioredis';
 
-const containerName = "blochain-fee-redis";
+const containerName = "blockchain-fee-redis";
 
 export default class Redis {
 

@@ -1,6 +1,6 @@
 services:
   fee-track:
-    container_name: track-blochain-fee
+    container_name: track-blockchain-fee
     build:
       context: .
     restart: unless-stopped
@@ -12,7 +12,7 @@ services:
       - ./logs:/logs
   redis:
     image: redis:7.4-alpine
-    container_name: blochain-fee-redis
+    container_name: blockchain-fee-redis
     restart: always
     ports:
       - '6379:6379'
