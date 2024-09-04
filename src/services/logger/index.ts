@@ -33,7 +33,6 @@ const formatLog = printf(({ level, message, timestamp }) => {
 export const logger = winston.createLogger({
     defaultMeta: { service: 'track-blockchain-fee' },
     transports: [
-        new winston.transports.Console(),
         new winston.transports.File({
             filename: '/logs/errors.log', level: 'error', format: combine(
                 timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
