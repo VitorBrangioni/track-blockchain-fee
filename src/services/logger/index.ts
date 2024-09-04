@@ -1,15 +1,49 @@
-import { CalculateFeeResult, Currency } from "../../services/crypto/interfaces";
-import winston from "winston";
+import { CalculateFeeResult, Currency } from "../crypto/interfaces";
+import winston, { format } from "winston";
+const { combine, timestamp, printf } = format;
+
 import Redis from "../../services/redis";
 
+export const formatError = (err) => {
+    return JSON.stringify({
+        message: err.message,
+        stack: err.stack,
+        name: err.name,
+        ...err
+    }, null, 2);
+};
+
+const infoFilter = format((info) => {
+    return info.level === 'info' ? info : false;
+});
+
+const errorFilter = format((info) => {
+    return info.level === 'error' ? info : false;
+});
+
+const formatLog = printf(({ level, message, timestamp }) => {
+    return `${timestamp} [${level.toUpperCase()}]: ${message}`;
+});
+
 export const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    defaultMeta: { service: 'user-service' },
+    defaultMeta: { service: 'track-blockchain-fee' },
     transports: [
-        new winston.transports.File({ filename: 'logs/errors.log', level: 'error' }),
-        new winston.transports.File({ filename: 'logs/fee-tracks.log' }),
+        new winston.transports.File({
+            filename: '/logs/errors.log', level: 'error', format: combine(
+                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                errorFilter(),
+                formatLog
+            )
+        }),
+        new winston.transports.File({
+            filename: '/logs/fee-tracks.log', level: 'info', format: combine(
+                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                infoFilter(),
+                formatLog
+            )
+        }),
     ],
+
 });
 
 // Fee for Bitcoin at 2023-05-18T15:17:00+00:00: 0.00012 BTC

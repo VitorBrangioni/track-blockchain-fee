@@ -10,6 +10,8 @@ services:
       - redis
     networks:
       - trackblockchainfee-network
+    volumes:
+      - ./logs:/logs
   redis:
     image: redis:7.4-alpine
     container_name: blochain-fee-redis

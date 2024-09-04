@@ -1,7 +1,6 @@
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { CalculateFeeResult } from "../interfaces";
-import { logger } from "../../report-fee";
 
 const currency = 'BTC';
 type NextBlocksInMinutes = '30' | '60' | '120' | '180' | '360' | '720' | '1440';
@@ -16,16 +15,9 @@ export async function calculateFee(transactionSize: number = 140): Promise<Calcu
             value: parseSatoshiToBTC(estimatedFeeInBTC)
         }
     } catch (error) {
-        console.log(' #### erorr ', error);
-        logger.error('Error to calculate fee: ' + error.message);
+        throw error;
     }
 }
-
-// export async function calculateSatPerVbyte(transactionSize: number = 140) {
-//     const feeRateInSatoshi = await fetchFeeRateInSatoshi();
-
-//     return feeRateInSatoshi.multipliedBy(transactionSize);
-// }
 
 export function parseSatoshiToBTC(satoshi: BigNumber) {
     return satoshi.multipliedBy(1e-8);
