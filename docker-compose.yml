@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   fee-track:
     container_name: track-blochain-fee
