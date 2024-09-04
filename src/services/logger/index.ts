@@ -1,11 +1,13 @@
 import { CalculateFeeResult, Currency } from "../crypto/interfaces";
 import winston, { format } from "winston";
 const { combine, timestamp, printf } = format;
+const { stringify } = require('flatted');
+
 
 import Redis from "../../services/redis";
 
 export const formatError = (err) => {
-    return JSON.stringify({
+    return stringify({
         message: err.message,
         stack: err.stack,
         name: err.name,
