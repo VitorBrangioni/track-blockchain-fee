@@ -1,4 +1,4 @@
-import { CalculateFeeResult, Currency } from "../crypto/interfaces";
+import { BlockchainNetwork, CalculateFeeResult, Currency } from "../crypto/interfaces";
 import winston, { format } from "winston";
 const { combine, timestamp, printf } = format;
 const { stringify } = require('flatted');
@@ -55,11 +55,11 @@ export const logger = winston.createLogger({
 export async function reportFee(feeResult: CalculateFeeResult) {
     const isSameValue = await isSameValuePreviousOne(feeResult);
 
-    if (isSameValue) return 
+    // if (isSameValue) return 
 
-    const cryptoName = Currency[feeResult.currency];
+    const blockchainNetwork = BlockchainNetwork[feeResult.currency];
     const date = new Date().toISOString().replace('Z', '+00:00');;
-    const message = `Fee for ${cryptoName} at ${date}: ${feeResult.value.toString()} ${feeResult.currency}`;
+    const message = `Fee for ${blockchainNetwork} at ${date}: ${feeResult.value.toString()} ${feeResult.currency}`;
 
     logger.info(message);
 

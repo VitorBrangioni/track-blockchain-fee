@@ -10,3 +10,9 @@ export enum Currency {
     BNB = 'BNB',
     ETH = 'ETH'
 }
+
+export enum BlockchainNetwork {
+    BTC = 'Bitcoin',
+    BNB = 'Binance Smart Chain',
+    ETH = 'Ethereum'
+}
